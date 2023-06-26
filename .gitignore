@@ -1,0 +1,16 @@
+# Get your own Github access token
+secrets.config
+
+# Folders generated during runtime
+data/
+download/
+error/
+log/
+
+# Environment folder
+vGencode/
+
+# vs congif
+.vscode/
+
+.DS_Store
