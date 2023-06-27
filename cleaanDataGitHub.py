@@ -5,7 +5,7 @@ import logging
 from log_config import configure_logging
 
 # Configure logging
-configure_logging('cleanDataGitHub')
+configure_logging()
 
 folder_path = "download"
 pwd = os.getcwd()

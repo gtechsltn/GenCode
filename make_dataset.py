@@ -5,7 +5,7 @@ import logging
 from log_config import configure_logging
 
 # Configure logging
-configure_logging("make_dataset")
+configure_logging()
 
 MAX_CHAR_LENGTH = 512  # Maximum context length
 MIN_CHAR_LENGTH = 400  # Minimum context length
@@ -29,13 +29,7 @@ read_e_file_count = 0
 GCodeT = os.path.dirname("data/GCodeT.txt")
 if not os.path.exists(GCodeT):
     os.makedirs(GCodeT)
-make_dataset_ReadError = os.path.dirname('error/make_dataset_ReadError.txt"')
-if not os.path.exists(make_dataset_ReadError):
-    os.makedirs(make_dataset_ReadError)
 
-GCodeT_WriteError = os.path.dirname("error/GCodeT_WriteError.txt")
-if not os.path.exists(GCodeT_WriteError):
-    os.makedirs(GCodeT_WriteError)
 
 with open("data/GCodeT.txt", "a", encoding="utf-8") as f:
     # Read each file, try to make the data fall in bounds with MAX_CHAR_LENGTH and MIN_CHAR_LENGTH
@@ -45,6 +39,9 @@ with open("data/GCodeT.txt", "a", encoding="utf-8") as f:
                 data = open(file, "r", encoding="utf-8").read()
             except Exception as ex:
                 logging.error(f'Read error {file}. Refer to make_dataset_ReadError.txt for more inormation')
+                make_dataset_ReadError = os.path.dirname('error/make_dataset_ReadError.txt"')
+                if not os.path.exists(make_dataset_ReadError):
+                    os.makedirs(make_dataset_ReadError)
                 with open(
                     "error/make_dataset_ReadError.txt", "a"
                 ) as make_dataset_ReadError:
@@ -68,6 +65,10 @@ with open("data/GCodeT.txt", "a", encoding="utf-8") as f:
             logging.debug(f"Processing: {file}")
     except Exception as e:
         logging.error(f'Error while reading:\n{file}. Refer to GCodeT_WriteError.txt for more information')
+        
+        GCodeT_WriteError = os.path.dirname("error/GCodeT_WriteError.txt")
+        if not os.path.exists(GCodeT_WriteError):
+            os.makedirs(GCodeT_WriteError)
         with open("error/GCodeT_WriteError.txt", "a") as GCodeT_WriteError:
             GCodeT_WriteError.write(f"Error while reading:\n{file}")
             GCodeT_WriteError.write(f"{str(e)}")
