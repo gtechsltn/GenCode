@@ -6,7 +6,10 @@ data/
 download/
 error/
 log/
+token/
+# Run time log files
 .log
+
 # Environment folder
 vGencode/
 

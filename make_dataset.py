@@ -77,3 +77,5 @@ with open("data/GCodeT.txt", "a", encoding="utf-8") as f:
             )
         # print(file)
         # print(str(e))
+    finally:
+        logging.info(f'Dataset created 🥳')

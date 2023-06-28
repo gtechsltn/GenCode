@@ -1,14 +1,23 @@
 import logging
+import sys
 import os
 
 def configure_logging():
 
-    log_file_path = os.path.abspath(__file__)
-    log_file_name : str = os.path.splitext(os.path.basename(log_file_path))[0]
+    log_file_name_full = (sys.argv[0]).split('/')
+    log_file_name = (log_file_name_full[-1]).split('.')[-2]
+    
+
+    log_file = f"log/{log_file_name}.log"
+    log_directory = os.path.dirname(log_file)
+    
+    if not os.path.exists(log_directory):
+        os.makedirs(log_directory)
+
 
     logging.basicConfig(
         level=logging.DEBUG,
-        filename=f"log/{log_file_name}.log",
+        filename=log_file,
         filemode="a",
-        format="%(asctime)s - %(levelname)s - %(message)s",
-    )
+        format="%(asctime)s - %(levelname)s - %(message)s"
+    )   

@@ -1,3 +1,5 @@
-tqdm
-PyGithub
-black
+tqdm                # Progress bar
+PyGithub            # Download GitHub repo
+black               # Formater
+transformers        
+torch               # Deplendency for transformers
