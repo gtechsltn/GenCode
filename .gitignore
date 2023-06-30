@@ -10,6 +10,9 @@ token/
 # Run time log files
 .log
 
+# Generated models
+GCodeModel
+
 # Environment folder
 vGencode/
 
