@@ -6,7 +6,7 @@ from classes.GCodePreprocessing_Utils import GCodePreprocessingUtils
 from log_config import configure_logging
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=False)
 class DataCleaner:
     """
 
@@ -21,16 +21,18 @@ class DataCleaner:
     """
 
     cleanDataIn: str
-    _preProcessor: GCodePreprocessingUtils
-    _pwd: str = field(default=os.getcwd(), init=False,repr=False)
+    _preProcessor: GCodePreprocessingUtils = field(init=False, repr=False)
+    _pwd: str = field(default=os.getcwd(), init=False, repr=False)
     _pre_clean_metric: tuple = field(init=False)
-    py_files: list = field(init=False,repr=False)
+    py_files: list = field(init=False, repr=False)
 
     def __post_init__(self) -> None:
         # Enable looging to this file
         configure_logging()
         # Create a GCodePreprocessingUtils instance
-        self._preProcessor: GCodePreprocessingUtils = GCodePreprocessingUtils(self.cleanDataIn)
+        self._preProcessor= GCodePreprocessingUtils(
+            self.cleanDataIn
+        )
         logging.info(f"Currently working on: {self._pwd}")
         # Compute the metrics
         self._pre_clean_metric, files_abspath = self._preProcessor.scan_files(
@@ -58,7 +60,8 @@ class DataCleaner:
 
 
 def main() -> None:
-    folder_path = "download"
+    # folder_path = "download"
+    folder_path = "/Volumes/Untitled/May2023"
     p = DataCleaner(cleanDataIn=folder_path)
     print(p)
 
