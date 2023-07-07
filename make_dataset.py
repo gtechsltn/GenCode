@@ -2,18 +2,12 @@ import os
 from tqdm import tqdm
 
 import logging
-from class_gencode.utils import GCodeModelUtils, GCodePreprocessingUtils
+from classes.GCodeModel_Utils import GCodeModelUtils
+from classes.GCodePreprocessing_Utils import GCodePreprocessingUtils
 from log_config import configure_logging
 
 # Configure logging
 configure_logging()
-
-
-def clculate_file_size(size_in_bytes):
-    size_in_kb = size_in_bytes / 1024
-    size_in_mb = size_in_kb / 1024
-    size_in_gb = size_in_mb / 1024
-    return size_in_kb, size_in_mb, size_in_gb
 
 
 MAX_CHAR_LENGTH = 512  # Maximum context length
