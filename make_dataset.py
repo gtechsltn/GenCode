@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from io import TextIOWrapper
-import os 
+import os
 from tqdm import tqdm
 
 import logging
@@ -24,54 +24,82 @@ class MakeDataset:
         configure_logging()
         self._precheck()
 
-    def _precheck(self)->None:
+    def _precheck(self) -> None:
         # Create the data directory if it does not exist
-        GC_folders = os.path.dirname('data/')
+        GC_folders = os.path.dirname("data/")
         if not os.path.exists(GC_folders):
             logging.info(f"Creating a folder for dataset")
             os.makedirs(GC_folders)
         else:
-            logging.info(f"Folder for dataset already available. Contents may be apended")
+            logging.info(
+                f"Folder for dataset already available. Contents may be apended"
+            )
 
         # Create the error directory if it does not exist
-        GC_folders = os.path.dirname('error/')
+        GC_folders = os.path.dirname("error/")
         if not os.path.exists(GC_folders):
-            logging.info(f"Creating a folder for dataset")
+            logging.info(f"Creating a folder for error")
             os.makedirs(GC_folders)
         else:
-            logging.info(f"Folder for dataset already available. Contents may be apended")
+            logging.info(f"Folder for error already available. Contents may be apended")
 
-
-    def create_dataset(self,file_list: list, batch: int) -> None:
+    def create_dataset(self, file_list: list, batch: int) -> None:
         dataset_file = f"data/GCodeT_{batch}.txt"
 
-        # Creating dataset file
-        with open(dataset_file,"a",encoding='utf-8') as datasetFile:
-            for pyFile in tqdm(file_list, desc=f"Creating dataset for batch {batch}"):
-                
-                try:
-                    pyContent = open(pyFile,'r',encoding='utf-8').read()
-                except Exception as e:
-                    logging.error(f"Error while reading {pyFile} for the bacth {batch}")
-                    with open('error/read_error.log','a',encoding='utf-8') as w_error_file:
-                        w_error_file.write(f"Error while reading {pyFile} for the bacth {batch}")
-                        w_error_file.write(str(e))
-                    logging.error(f"Refer to error/write_error.log")
-                
-                try:
-                    self._format_content(_content=pyContent,_fileObj = datasetFile)          
-                except Exception as e:
-                    logging.error(f"Error while writing dataset with content from {pyFile} for the bacth {batch}")
-                    with open('error/write_error.log','a',encoding='utf-8') as w_error_file:
-                        w_error_file.write(f"Error while creating dataset for the bacth {batch}")
-                        w_error_file.write(str(e))
-                    logging.error(f"Refer to error/write_error.log")
-            
-                             
+        try:
+            # Creating dataset file
+            with open(dataset_file, "a", encoding="utf-8") as datasetFile:
+                for pyFile in tqdm(
+                    file_list, desc=f"Creating dataset for batch {batch}"
+                ):
+                    try:
+                        pyContent = open(pyFile, "r", encoding="utf-8").read()
+                    except Exception as e:
+                        logging.error(
+                            f"Error while reading {pyFile} for the bacth {batch}"
+                        )
+                        with open(
+                            "error/read_error.log", "a", encoding="utf-8"
+                        ) as w_error_file:
+                            w_error_file.write(
+                                f"Error while reading {pyFile} for the bacth {batch}"
+                            )
+                            w_error_file.write(str(e))
+                        logging.error(f"Refer to error/write_error.log")
 
-    def _format_content(self,_content:str,_fileObj:TextIOWrapper)->str:
+                    try:
+                        self._format_content(_content=pyContent, _fileObj=datasetFile)
+                    except Exception as e:
+                        logging.error(
+                            f"Error while writing dataset with content from {pyFile} for the bacth {batch}"
+                        )
+                        with open(
+                            "error/write_error.log", "a", encoding="utf-8"
+                        ) as w_error_file:
+                            w_error_file.write(
+                                f"Error while creating dataset for the bacth {batch}"
+                            )
+                            w_error_file.write(str(e))
+                        logging.error(f"Refer to error/write_error.log")
+        except Exception as e:
+            logging.error(f"Error while creating dataset file {dataset_file}")
+            logging.error(f"Refer to error/create_dataset_error.log")
+            with open(
+                "error/create_dataset_error.log", "a", encoding="utf-8"
+            ) as c_error_file:
+                c_error_file.write(f"Error while creating dataset file {dataset_file}")
+                c_error_file.write(str(e))
+        finally:
+            # When dataset creation is completed check for any errors
+            if len(os.listdir("error")) == 0:
+                logging.info(f"Dataset created 🥳")
+            else:
+                logging.error(f"Problem with creation of the dataset file 😿")
+                logging.error(f"Check error directory for more info 🙁")
+
+    def _format_content(self, _content: str, _fileObj: TextIOWrapper) -> str:
         # Replace new line with NEW_LINE
-        formated_data = _content.replace('/n',self.NEW_LINE)
+        formated_data = _content.replace("\n", self.NEW_LINE)
         if 100 < len(_content) <= self.MAX_CHAR_LENGTH:
             _fileObj.write(formated_data + "\n")
         else:
@@ -82,6 +110,7 @@ class MakeDataset:
                 if self.MIN_CHAR_LENGTH <= len(substring) <= self.MAX_CHAR_LENGTH:
                     _fileObj.write(substring + "\n")
                 
+
 
 '''
 
