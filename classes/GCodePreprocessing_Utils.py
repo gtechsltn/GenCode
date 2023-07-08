@@ -1,77 +1,10 @@
-from concurrent import futures
 from tqdm import tqdm
 import os
-from typing import Union
 
 
 class GCodePreprocessingUtils:
     def __init__(self, source: str) -> None:
         self.sourcefolder = source
-
-    # def scan_files(self, scanFilesUnder: Union[str, None]):
-    #     """
-    #     Scans the files in the given folder or gets the folder name to scan from the class constructor
-        
-    #     Makes use of the available CPU cores
-
-    #     total size of the files in the folder, returns a 3-tuple followed by the list of full path of the files
-    #     `(size_in_kb, size_in_mb, size_in_gb)`, `[filepath]`
-    #     """
-    #     if scanFilesUnder is None:
-    #         scanFilesUnder = self.sourcefolder
-
-    #     source_file_list = []
-    #     size_in_bytes = 0
-
-    #     with futures.ThreadPoolExecutor() as executor:
-    #         future_to_path = {
-    #             executor.submit(self._scan_folder, folder, scanFilesUnder): folder
-    #             for folder in tqdm(
-    #                 os.listdir(scanFilesUnder),
-    #                 desc=f"Scanning folder: {scanFilesUnder}",
-    #             )
-    #         }
-
-    #         for future in tqdm(
-    #             futures.as_completed(future_to_path), desc="Scanning files"
-    #         ):
-    #             folder = future_to_path[future]
-    #             try:
-    #                 result = future.result()
-    #                 size_in_bytes += result[0]
-    #                 source_file_list.extend(result[1])
-    #             except Exception as exc:
-    #                 print(f"Exception occurred while scanning folder {folder}: {exc}")
-
-    #     sizeinfo = self._calculate_file_size(size_in_bytes)
-
-    #     return sizeinfo, source_file_list
-
-
-    def scan_files(self, scanFilesUnder=None):
-        """
-        Scans the files in the given folder or gets the folder name to scan from the class constructor
-        total size of the files in the folder, returns a 3-tuple followed by the list of full path of the files
-             `(size_in_kb, size_in_mb, size_in_gb)`, `[filepath]`
-        """
-        if scanFilesUnder is None:
-            scanFilesUnder = self.sourcefolder
-
-        source_file_list = []
-        size_in_bytes = 0
-
-        for root, dirs, files in tqdm(os.walk(scanFilesUnder)):
-            for f in files:
-                #  Get the py file full path
-                full_path = os.path.join(root, f)
-                # Get the size of individual files
-                size_in_bytes += os.path.getsize(full_path)
-                # Add file full path to a list
-                source_file_list.append(full_path)
-
-        sizeinfo = self._clculate_file_size(size_in_bytes)
-
-        return sizeinfo, source_file_list
 
     def _calculate_file_size(self, size_in_bytes):
         """
@@ -80,23 +13,34 @@ class GCodePreprocessingUtils:
         size_in_kb = size_in_bytes / 1024
         size_in_mb = size_in_kb / 1024
         size_in_gb = size_in_mb / 1024
-        print(size_in_kb, size_in_mb, size_in_gb)
+        # print(size_in_kb, size_in_mb, size_in_gb)
         return (size_in_kb, size_in_mb, size_in_gb)
 
-    def _scan_folder(self, folder, scanFilesUnder):
-        folder_path = os.path.join(scanFilesUnder, folder)
-        folder_size = 0
-        file_paths = []
+ 
+    def folder_metrics(self ,folder_list: list,batch_number:int):
+        """ This retruns a dictionary where the key is the Full path of each files and the valu is a 3-tuple (size in kb, size in mb, size in GB)
 
-        for root, dirs, files in os.walk(folder_path):
-            for f in files:
-                full_path = os.path.join(root, f)
-                folder_size += os.path.getsize(full_path)
-                file_paths.append(full_path)
+        Note: This will ignore the `.git`, `.DS_Store` files/folders if any 
+        """
+        folder_info: dict = {}
 
-        return folder_size, file_paths
+        pwd = os.path.join(os.getcwd(),self.sourcefolder) 
+        for folder_name in tqdm(folder_list,desc=f"Running {batch_number}th batch"):
+            IGNORABLE = ['.DS_Store','.git']
+            folder_path = os.path.join(pwd,folder_name)
+            for root, dirs, files in os.walk(folder_path):
+                for file_name in files:
+                    file_path = os.path.join(root, file_name)
+                    if any(ignored in file_path for ignored in IGNORABLE):
+                        continue
+                    else:
+                        folder_info[file_path] = self._calculate_file_size(os.path.getsize(file_path))
+                        # file_paths.append(file_path)
+        return folder_info
 
-
-if __name__ == "__main__":
+def main():
     GUtils = GCodePreprocessingUtils(source="download")
     GUtils.scan_files(scanFilesUnder="download")
+
+if __name__ == "__main__":
+    main()
