@@ -98,8 +98,8 @@ class DataCleaner:
 
 
 def main() -> None:
-    folder_path = "download"
-    # folder_path = "/Volumes/Untitled/May2023"
+    #folder_path = "download"
+    folder_path = "/Volumes/Untitled/June2023"
     dc = DataCleaner(cleanDataIn=folder_path)
     dc.start_batch_process()
 

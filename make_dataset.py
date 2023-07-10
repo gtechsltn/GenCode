@@ -44,7 +44,7 @@ class MakeDataset:
             logging.info(f"Folder for error already available. Contents may be apended")
 
     def create_dataset(self, file_list: list, batch: int) -> None:
-        dataset_file = f"data/GCodeT_{batch}.txt"
+        dataset_file = f"data/GCodeT_June_{batch}.txt"
 
         try:
             # Creating dataset file
@@ -62,9 +62,9 @@ class MakeDataset:
                             "error/read_error.log", "a", encoding="utf-8"
                         ) as w_error_file:
                             w_error_file.write(
-                                f"Error while reading {pyFile} for the bacth {batch}"
+                                f"Error while reading {pyFile} for the bacth {batch}\n"
                             )
-                            w_error_file.write(str(e))
+                            w_error_file.write(f"{str(e)}\n")
                         logging.error(f"Refer to error/write_error.log")
 
                     try:
@@ -77,9 +77,9 @@ class MakeDataset:
                             "error/write_error.log", "a", encoding="utf-8"
                         ) as w_error_file:
                             w_error_file.write(
-                                f"Error while creating dataset for the bacth {batch}"
+                                f"Error while creating dataset for the bacth {batch}\n"
                             )
-                            w_error_file.write(str(e))
+                            w_error_file.write(str(e)+'\n')
                         logging.error(f"Refer to error/write_error.log")
         except Exception as e:
             logging.error(f"Error while creating dataset file {dataset_file}")
@@ -87,8 +87,8 @@ class MakeDataset:
             with open(
                 "error/create_dataset_error.log", "a", encoding="utf-8"
             ) as c_error_file:
-                c_error_file.write(f"Error while creating dataset file {dataset_file}")
-                c_error_file.write(str(e))
+                c_error_file.write(f"Error while creating dataset file {dataset_file}\n")
+                c_error_file.write(str(e)+'\n')
         finally:
             # When dataset creation is completed check for any errors
             if len(os.listdir("error")) == 0:
