@@ -36,8 +36,9 @@ try:
 except:
     logging.error(f"assertinon failed: {tokenizer.decode(encoded) == text}")
 
-model = GPT2LMHeadModel.from_pretrained("GCodeModel")
+model = GPT2LMHeadModel.from_pretrained("GCodeModel/checkpoint-400") # add your checkpooint file path
 
+print("Type 'q' or 'quit' to exit this terminal")
 while True:
     imp = input("✨>>> ")
     if imp == 'q' or imp == 'quit':
